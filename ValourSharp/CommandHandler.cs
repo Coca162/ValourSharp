@@ -16,7 +16,7 @@ public static class CommandHandler
 
     public static async Task MessageHandler(PlanetMessage ctx)
     {
-        var sender = await (await ctx.GetAuthorAsync()).GetUserAsync()
+        var sender = await (await ctx.GetAuthorAsync()).GetUserAsync();
 
         var matches = Prefixes!.Where(prefix => ctx.Content.StartsWith(prefix, StringComparison.InvariantCultureIgnoreCase));
 
