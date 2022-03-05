@@ -171,12 +171,11 @@ public static class Registration
             return false;
 
         // qualifies if any method or type qualifies
-        return type.DeclaredMethods.Any(xmi => xmi.IsCommandCandidate(out _)) || type.DeclaredNestedTypes.Any(xti => xti.IsModuleCandidateType());
+        return type.DeclaredMethods.Any(xmi => xmi.IsCommandCandidate() || type.DeclaredNestedTypes.Any(xti => xti.IsModuleCandidateType());
     }
 
-    private static bool IsCommandCandidate(this MethodInfo method, out ParameterInfo[] parameters)
+    private static bool IsCommandCandidate(this MethodInfo method)
     {
-        parameters = null;
         // check if exists
         if (method == null)
             return false;
@@ -186,7 +185,7 @@ public static class Registration
             return false;
 
         // check if appropriate return and arguments
-        parameters = method.GetParameters();
+        var parameters = method.GetParameters();
         if (!parameters.Any() || parameters.First().ParameterType != typeof(PlanetMessage) || method.ReturnType != typeof(Task))
             return false;
 
