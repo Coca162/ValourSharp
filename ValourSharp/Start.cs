@@ -6,7 +6,7 @@ namespace ValourSharp;
 public static class Start
 {
     public static string[]? Prefixes;
-    public static async Task Initialize(string email, string password, params string[] prefixes!!)
+    public static async Task Initialize(string email, string password, params string[] prefixes)
     {
         Prefixes = prefixes;
 
