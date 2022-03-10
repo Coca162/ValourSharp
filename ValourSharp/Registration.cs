@@ -1,23 +1,37 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using Valour.Api.Items.Messages;
-using static ValourSharp.CommandHandler;
-using System.Linq;
+using static ValourSharp.CommandsService;
+using ValourSharp.Attributes;
 
 namespace ValourSharp;
 
 public static class Registration
 {
-    public static void RegisterCommands<T>() where T : BaseCommandModule
+    public static void RegisterCommands(Assembly assembly)
     {
-        RegisterCommands(typeof(T));
+        var modules = assembly.ExportedTypes.Where(type =>
+        {
+            var info = type.GetTypeInfo();
+            return info.IsModuleCandidateType() && !info.IsNested;
+        });
+
+        foreach (Type module in modules)
+            RegisterCommands(module);
     }
+
+    public static void RegisterCommands<T>() where T : BaseCommandModule => RegisterCommands(typeof(T));
 
     public static void RegisterCommands(Type commandModule)
     {
-        var checks = commandModule.GetCustomAttributes<CheckBaseAttribute>(true);
+        IEnumerable<Func<PlanetMessage, Task<bool>>>
+            checks = commandModule.GetCustomAttributes<CheckBaseAttribute>(true).Select(x =>
+            {
+                Func<PlanetMessage, Task<bool>> thing = x.ExecuteCheckAsync;
+                return thing;
+            });
 
-        var attribute = commandModule.GetCustomAttribute<Group>(false);
+        var attribute = commandModule.GetCustomAttribute<GroupAttribute>(false);
         if (attribute is not null)
         {
             var module = GroupToModule(commandModule, attribute);
@@ -30,7 +44,7 @@ public static class Registration
             Commands.Add(name, module.CombineChecks(checks));
     }
 
-    private static Dictionary<string, CommandModule> TypeToModules(Type commandModule)
+    internal static Dictionary<string, CommandModule> TypeToModules(Type commandModule)
     {
         Dictionary<string, CommandModule> modules = new();
         var baseModule = BaseToModules(commandModule);
@@ -44,7 +58,7 @@ public static class Registration
         return modules;
     }
 
-    private static List<CommandModule> BaseToModules(Type commandModule)
+    internal static List<CommandModule> BaseToModules(Type commandModule)
     {
         var methods = commandModule.GetMethods();
         List<CommandInfo> commands = new(methods.Length);
@@ -54,7 +68,7 @@ public static class Registration
         //This would be LINQ if we didn't use the attribute from guard if
         foreach (var method in commandModule.GetMethods())
         {
-            var attribute = method.GetCustomAttribute<Command>(false);
+            var attribute = method.GetCustomAttribute<CommandAttribute>(false);
             if (attribute is null) continue;
 
             CommandInfo command = new(attribute.Name, method);
@@ -65,9 +79,13 @@ public static class Registration
 
         foreach(var group in grouped)
         {
-            var alias = group.Select(x => x.Method.GetCustomAttribute<Aliases>(false)?.Names).MaxBy(x => x is null ? 0 : x.Length);
-            var checks = group.Select(x => x.Method.GetCustomAttributes<CheckBaseAttribute>(true).ToArray()).MaxBy(x => x.Length);
-            checks = checks is null ? Array.Empty<CheckBaseAttribute>() : checks;
+            var alias = group.Select(x => x.Method.GetCustomAttribute<AliasesAttribute>(false)?.Names).MaxBy(x => x is null ? 0 : x.Length);
+            var checks = group.Select(x => x.Method.GetCustomAttributes<CheckBaseAttribute>(true).ToArray()).MaxBy(x => x.Length)?.Select(x =>
+            {
+                Func<PlanetMessage, Task<bool>> thing = x.ExecuteCheckAsync;
+                return thing;
+            }).ToArray();
+            checks = checks is null ? Array.Empty<Func<PlanetMessage, Task<bool>>>() : checks;
 
             if (alias is null) alias = new string[1] { group.Key };
             else
@@ -83,12 +101,12 @@ public static class Registration
         return modules;
     }
 
-    private static CommandModule GroupToModule(Type commandModule, Group group)
+    internal static CommandModule GroupToModule(Type commandModule, GroupAttribute group)
     {
         var methods = commandModule.GetMethods();
 
         List<CommandInfo> commands = commandModule.GetMethods()
-                                                  .Where(method => method.GetCustomAttribute<GroupCommand>(false) is not null)
+                                                  .Where(method => method.GetCustomAttribute<GroupCommandAttribute>(false) is not null)
                                                   .Select(method => new CommandInfo("", method))
                                                   .ToList();
 
@@ -99,7 +117,7 @@ public static class Registration
 
         foreach (Type type in nested)
         {
-            if (type.GetCustomAttribute(typeof(Group)) is not Group attribute) continue;
+            if (type.GetCustomAttribute(typeof(GroupAttribute)) is not GroupAttribute attribute) continue;
 
             var module = GroupToModule(type, attribute);
             foreach(string name in module.Names is null? Array.Empty<string>() : module.Names)
@@ -111,39 +129,16 @@ public static class Registration
         foreach ((string name, CommandModule typesCommands) in TypeToModules(commandModule))
             modules.Add(name, typesCommands);
 
-        var checks = commands.Select(x => x.Method.GetCustomAttributes<CheckBaseAttribute>(true).ToArray()).MaxBy(x => x.Length);
-        checks = checks is null ? Array.Empty<CheckBaseAttribute>() : checks;
+        var checks = commands.Select(x => x.Method.GetCustomAttributes<CheckBaseAttribute>(true).ToArray()).MaxBy(x => x.Length)?.Select(x =>
+        {
+            Func<PlanetMessage, Task<bool>> thing = x.ExecuteCheckAsync;
+            return thing;
+        }).ToArray();
+        checks = checks is null ? Array.Empty<Func<PlanetMessage, Task<bool>>>() : checks;
 
         return commands.Count != commands.DistinctBy(x => x.Priority).Count()
             ? throw new Exception("Same priority or no priority for overloads of command!")
             : new CommandModule(group.Names, commands.OrderByDescending(x => x.Priority).ToArray(), checks, modules);
-    }
-
-    public static void RegisterCommands(Assembly assembly)
-    {
-        var modules = assembly.ExportedTypes.Where(type =>
-        {
-            var info = type.GetTypeInfo();
-            return info.IsModuleCandidateType() && !info.IsNested;
-        });
-
-        foreach (Type module in modules)
-        {
-            RegisterCommands(module);
-        }
-        
-        //var methods = assembly.GetTypes().SelectMany(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static)).ToList();
-
-        //methods.RemoveAll(x => x.IsAbstract || x.GetCustomAttribute(typeof(Command)) is null || (x.DeclaringType is null && x.DeclaringType.GetCustomAttribute(typeof(Group)) is null));
-
-        //foreach (var method in methods)
-        //{
-        //    var attribute = method.GetCustomAttribute(typeof(Command)) as Command;
-        //    RegisterCommand(method, attribute.Names);
-        //    //TODO make it so it checks if you used the remainder incorrectly
-        //}
-
-        ////DO GROUP COMMANDS HERE
     }
 
     private static bool IsModuleCandidateType(this TypeInfo type)

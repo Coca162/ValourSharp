@@ -7,13 +7,13 @@ using Valour.Api.Items.Messages;
 using Valour.Api.Items.Planets.Members;
 using Valour.Api.Items.Planets.Channels;
 using static ValourSharp.Start;
+using ValourSharp.Attributes;
+using static ValourSharp.CommandsService;
 
 namespace ValourSharp;
 
 public static class CommandHandler
 {
-    public static Dictionary<string, CommandModule> Commands { get; set; } = new(StringComparer.InvariantCultureIgnoreCase);
-
     public static async Task MessageHandler(PlanetMessage ctx)
     {
         var sender = await (await ctx.GetAuthorAsync()).GetUserAsync();
@@ -32,7 +32,7 @@ public static class CommandHandler
         var (module, name) = tuple.Value;
 
         foreach (var check in module!.Checks)
-            if (!await check.ExecuteCheckAsync(ctx)) return;
+            if (!await check(ctx)) return;
 
         foreach (var command in module!.ModuleCommands)
         {
@@ -56,7 +56,7 @@ public static class CommandHandler
                 }
 
                 var position = i - contexts;
-                if (parameter.ParameterType == typeof(string) && parameter.GetCustomAttribute(typeof(Remainder), false) is not null)
+                if (parameter.ParameterType == typeof(string) && parameter.GetCustomAttribute(typeof(RemainderAttribute), false) is not null)
                 {
                     args[i] = string.Join(' ', stringArgs.GetRange(position, stringArgs.Count - position));
                     continue;
@@ -100,7 +100,7 @@ public static class CommandHandler
         }
     }
 
-    private static (CommandModule module, string name)? GetModule(ref List<string> stringArgs)
+    internal static (CommandModule module, string name)? GetModule(ref List<string> stringArgs)
     {
         string name = stringArgs[0];
         if (!Commands.TryGetValue(name, out CommandModule? module)) return null;
@@ -116,26 +116,6 @@ public static class CommandHandler
         }
 
         return (module, name);
-    }
-
-    private static bool GetCommands(ref List<string> stringArgs, Dictionary<string, CommandModule> modules, out CommandModule? module, out string names)
-    {
-        names = stringArgs[0];
-        if (!modules.TryGetValue(names, out module)) return false;
-        stringArgs.RemoveAt(0);
-
-        if (module.SubGroups is not null && module.SubGroups.Count != 0 && stringArgs.Count != 0)
-        {
-            List<string> currentArgs = new(stringArgs);
-            var currentModule = module;
-            if (GetCommands(ref stringArgs, module.SubGroups, out module, out names)) return true;
-
-            stringArgs = currentArgs;
-            module = currentModule;
-            names = stringArgs[0];
-        };
-
-        return true;
     }
 
     private static bool IsValourType(this ParameterInfo parameter) => 
