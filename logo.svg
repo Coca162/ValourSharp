@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   height="1000"
+   width="1000"
+   version="1.1"
+   viewBox="0 0 1000 1000"
+   id="svg8">
+  <metadata
+     id="metadata33">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs9">
+    <linearGradient
+       id="linearGradient924">
+      <stop
+         id="stop920"
+         offset="0"
+         style="stop-color:#bf06fd;stop-opacity:1;" />
+      <stop
+         id="stop922"
+         offset="1"
+         style="stop-color:#bf06fd;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient916"
+       x1="82.82"
+       y1="450.97"
+       x2="518.03998"
+       y2="87.639999"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         style="stop-opacity:0"
+         offset="0"
+         stop-color="#bf06fd"
+         id="stop912" />
+      <stop
+         offset="1"
+         stop-color="#0c06fd"
+         id="stop914" />
+    </linearGradient>
+    <style
+       id="style2">.cls-1{fill-opacity:1;fill:url(#linear-gradient);}.cls-2{fill:#fff;}</style>
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
+       y2="87.639999"
+       x2="518.03998"
+       y1="450.97"
+       x1="82.82"
+       id="linear-gradient">
+      <stop
+         id="stop4"
+         stop-color="#bf06fd"
+         offset="0" />
+      <stop
+         id="stop6"
+         stop-color="#0c06fd"
+         offset="1" />
+    </linearGradient>
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
+       y2="283.465"
+       x2="495.60361"
+       y1="283.465"
+       x1="71.32637"
+       id="linearGradient926"
+       xlink:href="#linearGradient924" />
+  </defs>
+  <rect
+     y="0"
+     x="0"
+     height="1000"
+     width="1000"
+     id="rect870"
+     style="fill:#4b1481;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+  <text
+     id="text868"
+     y="1000.001"
+     x="-84.014725"
+     style="font-style:normal;font-weight:normal;font-size:1393.2px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#7322c2;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     xml:space="preserve"><tspan
+       style="fill:#7322c2;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       y="1000.001"
+       x="-84.014725"
+       id="tspan866">#</tspan></text>
+  <text
+     id="text944"
+     y="999.99823"
+     x="31.14698"
+     style="font-style:normal;font-weight:normal;font-size:1371.73px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:34.2934"
+     xml:space="preserve"><tspan
+       style="fill:#ffffff;stroke-width:34.2934"
+       y="999.99823"
+       x="31.14698"
+       id="tspan942">V</tspan></text>
+</svg>
