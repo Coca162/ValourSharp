@@ -6,12 +6,12 @@
 		<Nullable>enable</Nullable>
 		<EnablePreviewFeatures>True</EnablePreviewFeatures>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Version>1.0.0</Version>
+		<Version>1.0.1</Version>
 		<Authors>Coca</Authors>
 		<PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<Description>.NET Library for making Valour bots!</Description>
-		<PackageReleaseNotes>Initial Release</PackageReleaseNotes>
+		<PackageReleaseNotes>Adding Logo</PackageReleaseNotes>
 		<PackageTags>Valour ValourSharp Bot ValourBot</PackageTags>
 		<RepositoryUrl>https://github.com/Coca162/ValourSharp</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
